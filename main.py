@@ -4,72 +4,91 @@ from PyQt5.QtGui import QPixmap
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtGui import QCursor
 
+import json
+
 
 widgets = {
     "logo": [],
     "button": [],
     "question": [],
-    "answer1": [],
-    "answer2": [],
-    "answer3": [],
-    "answer4": []
+    "answers": []
 }
 
-
 app = QApplication(sys.argv)
+
 window = QWidget()
 window.setWindowTitle("Papaya Season")
 window.setFixedWidth(1000)
-#window.move(2700, 200)
+# window.move(2700, 200)
 window.setStyleSheet("background: 'white'")
 
 grid = QGridLayout()
+
 
 def clear_widgets():
     for widget in widgets:
         if widgets[widget] != []:
             widgets[widget][-1].hide()
+            for w in widgets[widget]:
+                w.hide()
         for i in range(0, len(widgets[widget])):
             widgets[widget].pop()
 
+
+def get_countries_list_from_json():
+    with open("seasons.json", "r") as f:
+        data = json.load(f)
+
+        countries = []
+        #length of list countries in json data for flexible number of countries
+        for i in range(len(data["countries"])):
+            countries.append(data["countries"][i]["country"])
+
+        return countries
+
+
+numberOfCountries = len(get_countries_list_from_json())
+
 def show_frame1():
     clear_widgets()
-    frame1()
+    frame_1()
 
 
 def start_game():
     clear_widgets()
-    frame2()
+    frame_2()
 
-def create_buttons(answer, l_margin, r_margin):
+
+def create_buttons(answer, l_margin = 85, r_margin = 85):
     button = QPushButton(answer)
     button.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
-    button.setFixedWidth(485)
+    #button.setFixedWidth(485)
     button.setStyleSheet(
         "*{border: 4px solid '#353535';" +
         "margin-left: " + str(l_margin) + "px;" +
         "margin-right: " + str(r_margin) + "px;" +
         "color: #353535;" +
         "font-family: 'Helvetica';" +
-        "font-size: 16px;" +
+        "font-size: 20px;" +
         "border-radius: 25px;" +
         "padding: 15px 0;" +
         "margin-top: 20px}" +
-        "*:hover{background: '#C6FF33'}"
+        "*:hover{background-color: '#C6FF33'}"
     )
     button.clicked.connect(show_frame1)
     return button
 
-def frame1():
-    #display logo
+
+def frame_1():
+    # display logo
     image = QPixmap("logo_512px.png")
     logo = QLabel()
     logo.setPixmap(image)
     logo.setAlignment(QtCore.Qt.AlignCenter)
-    logo.setStyleSheet("margin-top: 100px;")
+    logo.setStyleSheet("margin-top: 50px;")
     widgets["logo"].append(logo)
 
-    #button widget
+    # button widget
     button = QPushButton("START")
     button.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
     button.setStyleSheet(
@@ -88,8 +107,8 @@ def frame1():
     grid.addWidget(widgets["button"][-1], 1, 0, 1, 2)
 
 
-def frame2():
-    question = QLabel("Placeholder text will go here")
+def frame_2():
+    question = QLabel("Where is your papaya from?")
     question.setAlignment(QtCore.Qt.AlignCenter)
     question.setWordWrap(True)
     question.setStyleSheet(
@@ -97,39 +116,36 @@ def frame2():
         "font-size: 25px;" +
         "color: '#353535';" +
         "padding: 75px;"
-        "margin: 100px;"
-    )
+        "margin: 50px;")
     widgets["question"].append(question)
 
-    button1 = create_buttons("answer1", 85, 5)
-    button2 = create_buttons("answer2", 5, 85)
-    button3 = create_buttons("answer3", 85, 5)
-    button4 = create_buttons("answer4", 5, 85)
+    for i in range(0, numberOfCountries):
+        button = create_buttons(get_countries_list_from_json()[i])
+        widgets["answers"].append(button)
 
-    widgets["answer1"].append(button1)
-    widgets["answer2"].append(button2)
-    widgets["answer3"].append(button3)
-    widgets["answer4"].append(button4)
+    #buttons for countries start from second row in grid
+    for i, j in zip(range(0, numberOfCountries),range(2, numberOfCountries + 2)):
+        grid.addWidget(widgets["answers"][i], j, 0, 1, 3)
 
     image = QPixmap("logo_bottom_128px.png")
     logo = QLabel()
     logo.setPixmap(image)
     logo.setAlignment(QtCore.Qt.AlignCenter)
-    logo.setStyleSheet("margin-top: 75x; margin-bottom: 30px;")
+    logo.setStyleSheet("margin-top: 50x; margin-bottom: 15px;")
     widgets["logo"].append(logo)
 
-    grid.addWidget(widgets["question"][-1], 1, 0, 1, 2)
-    grid.addWidget(widgets["answer1"][-1], 2, 0)
-    grid.addWidget(widgets["answer2"][-1], 2, 1)
-    grid.addWidget(widgets["answer3"][-1], 3, 0)
-    grid.addWidget(widgets["answer4"][-1], 3, 1)
-    grid.addWidget(widgets["logo"][-1], 4, 0, 1, 2)
+    grid.addWidget(widgets["question"][-1], 1, 0, 1, 3)
+    # number of rows is dependent on number of countries for flexible position on grid
+    grid.addWidget(widgets["logo"][-1], numberOfCountries + 2, 0, 1, 3)
 
 
-frame1()
+frame_1()
 
 
 window.setLayout(grid)
 
+
 window.show()
+
+
 sys.exit(app.exec())
