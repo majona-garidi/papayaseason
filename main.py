@@ -1,8 +1,8 @@
+import calendar
 import sys
-from PyQt5.QtWidgets import QApplication, QLabel, QPushButton, QVBoxLayout, QWidget, QFileDialog, QGridLayout, \
-    QScrollArea
-from PyQt5.QtGui import QPixmap, QMovie, QPalette, QImage
-from PyQt5 import QtGui, QtCore
+from PyQt5.QtWidgets import QApplication, QLabel, QPushButton, QWidget, QGridLayout
+from PyQt5.QtGui import QPixmap, QMovie
+from PyQt5 import QtCore
 from PyQt5.QtGui import QCursor
 import json
 from datetime import date
@@ -27,13 +27,11 @@ window.setWindowTitle("Papaya Season")
 # there are in the json data
 # therefore adjustSize() is used to react to the varying quantity of buttons
 window.adjustSize()
-#window.setFixedWidth(1000)
-#window.move(2700, 200)
 window.setStyleSheet("background: 'white'")
 
 grid = QGridLayout()
 
-clickedAnswerButtonCountry = None
+clicked_answer_button_country = None
 
 
 def clear_widgets():
@@ -69,7 +67,7 @@ def get_countries_list_from_json():
         return countries
 
 
-numberOfCountries = len(get_countries_list_from_json())
+number_of_countries = len(get_countries_list_from_json())
 
 
 def show_frame1():
@@ -99,7 +97,7 @@ def create_buttons(answer, l_margin = 85, r_margin = 85):
     button.setStyleSheet(
         "*{border: 4px solid '#353535';" +
         "margin-left: " + str(l_margin) + "px;" +
-        "margin-right: " + str(r_margin) + "px;" +
+        "margin-right: " + str(r_margin) + "px;" + 
         "color: #353535;" +
         "font-family: 'Helvetica';" +
         "font-size: 20px;" +
@@ -161,7 +159,7 @@ def frame_2():
     fill_button_with_data()
 
     # buttons for countries start from second row in grid
-    for i, j in zip(range(0, numberOfCountries), range(2, numberOfCountries + 2)):
+    for i, j in zip(range(0, number_of_countries), range(2, number_of_countries + 2)):
 
         grid.addWidget(widgets["answers"][i], j, 0, 1, 2)
 
@@ -174,21 +172,20 @@ def frame_2():
 
     grid.addWidget(widgets["question"][-1], 1, 0, 1, 2)
     # number of rows is dependent on number of countries for flexible position on grid
-    grid.addWidget(widgets["logo"][-1], numberOfCountries + 2, 0, 1, 2)
+    grid.addWidget(widgets["logo"][-1], number_of_countries + 2, 0, 1, 2)
 
 
-def which_button_was_clicked(clickedbutton):
+def which_button_was_clicked(clicked_button):
 
     # sender() method of class QWidget saves whichever object sent a signal, here: clicked button
-    global clickedAnswerButtonCountry
-    clickedAnswerButtonCountry = clickedbutton.sender().text()
-    # print(clickedAnswerButtonCountry)
-    return clickedAnswerButtonCountry
+    global clicked_answer_button_country
+    clicked_answer_button_country = clicked_button.sender().text()
+    return clicked_answer_button_country
 
 
 def fill_button_with_data():
 
-    for i in range(0, numberOfCountries):
+    for i in range(0, number_of_countries):
 
         button = create_buttons(get_countries_list_from_json()[i])
         widgets["answers"].append(button)
@@ -204,9 +201,7 @@ def fill_button_with_data():
 
 def frame_3():
 
-    season_check()
-
-    result = QLabel("It's " "? " + "in " + clickedAnswerButtonCountry)
+    result = QLabel(answer_sentence())
     result.setAlignment(QtCore.Qt.AlignCenter)
     result.setWordWrap(True)
     result.setStyleSheet(
@@ -225,11 +220,10 @@ def frame_3():
     logo.setAlignment(QtCore.Qt.AlignCenter)
     logo.setStyleSheet("margin-top: 50x; margin-bottom: 15px;")
     widgets["logo"].append(logo)
-    grid.addWidget(widgets["logo"][-1], numberOfCountries + 2, 0, 1, 2)
+    grid.addWidget(widgets["logo"][-1], number_of_countries + 2, 0, 1, 2)
 
-    get_main_season_list_from_clicked_button()
 
-    get_availability_list_from_clicked_button()
+main_season_for_clicked_button = None
 
 
 def get_main_season_list_from_clicked_button():
@@ -238,8 +232,33 @@ def get_main_season_list_from_clicked_button():
         data = json.load(f)
 
     for country_dict in data["countries"]:
-        if country_dict["country"] == clickedAnswerButtonCountry:
-            return country_dict["mainSeason"]
+        if country_dict["country"] == clicked_answer_button_country:
+            newlist = country_dict["mainSeason"]
+            return newlist
+
+
+def main_season_list_as_months():
+
+    month_list = []
+
+    for i in get_main_season_list_from_clicked_button():
+
+        monat = calendar.month_name[i]
+
+        month_list.append(monat)
+
+    return month_list
+
+
+current_month = None
+
+
+def next_papaya_season():
+
+    # supposing that value at index 0 in the json data has also the lowest value of all entries
+    next_season_start = main_season_list_as_months()[0]
+
+    return next_season_start
 
 
 def get_availability_list_from_clicked_button():
@@ -248,23 +267,40 @@ def get_availability_list_from_clicked_button():
         data = json.load(f)
 
     for country_dict in data["countries"]:
-        if country_dict["country"] == clickedAnswerButtonCountry:
+        if country_dict["country"] == clicked_answer_button_country:
+
             return country_dict["availability"]
 
 
 def season_check():
 
-    currentmonth = date.today().month
+    global current_month
+    current_month = date.today().month
 
-    seasonlist = get_main_season_list_from_clicked_button()
+    season_list = get_main_season_list_from_clicked_button()
 
-    if currentmonth in seasonlist:
+    if current_month in season_list:
 
-        print("yes")
+        return True
 
     else:
 
-        print("no")
+        return False
+
+
+def answer_sentence():
+
+    if season_check() == True:
+
+        place_affirming_animation_on_grid()
+
+        return "You're lucky! It's papaya season in " + clicked_answer_button_country
+
+    else:
+
+        place_warning_animation_on_grid()
+
+        return "The next papaya season in " + clicked_answer_button_country + " starts in " + next_papaya_season()
 
 
 def place_warning_animation_on_grid():
