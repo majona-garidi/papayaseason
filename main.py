@@ -3,7 +3,7 @@ import sys
 from PyQt5.QtWidgets import QApplication, QLabel, QPushButton, QWidget, QGridLayout
 from PyQt5.QtGui import QPixmap, QMovie
 from PyQt5 import QtCore
-from PyQt5.QtGui import QCursor
+from PyQt5.QtGui import QCursor, QFontDatabase
 import json
 from datetime import date
 
@@ -27,9 +27,11 @@ window.setWindowTitle("Papaya Season")
 # there are in the json data
 # therefore adjustSize() is used to react to the varying quantity of buttons
 window.adjustSize()
+window.setFixedWidth(700)
 window.setStyleSheet("background: 'white'")
 
 grid = QGridLayout()
+
 
 clicked_answer_button_country = None
 
@@ -95,11 +97,10 @@ def create_buttons(answer, l_margin = 85, r_margin = 85):
     # button.setFixedWidth(485)
 
     button.setStyleSheet(
-        "*{border: 4px solid '#353535';" +
+        "*{border: 2px solid '#353535';" +
         "margin-left: " + str(l_margin) + "px;" +
         "margin-right: " + str(r_margin) + "px;" + 
         "color: #353535;" +
-        "font-family: 'Helvetica';" +
         "font-size: 20px;" +
         "border-radius: 25px;" +
         "padding: 15px 0;" +
@@ -113,7 +114,7 @@ def create_buttons(answer, l_margin = 85, r_margin = 85):
 def frame_1():
 
     # display logo
-    image = QPixmap("logo_512px.png")
+    image = QPixmap("icons/logo_500px.png")
     logo = QLabel()
     logo.setPixmap(image)
     logo.setAlignment(QtCore.Qt.AlignCenter)
@@ -125,7 +126,7 @@ def frame_1():
     button.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
 
     button.setStyleSheet(
-        "*{border: 4px solid '#353535';" +
+        "*{border: 2px solid '#353535';" +
         "border-radius: 45px;" +
         "font-size: 35px;" +
         "color: '#353535';" +
@@ -163,7 +164,7 @@ def frame_2():
 
         grid.addWidget(widgets["answers"][i], j, 0, 1, 2)
 
-    image = QPixmap("logo_bottom_128px.png")
+    image = QPixmap("icons/1.png")
     logo = QLabel()
     logo.setPixmap(image)
     logo.setAlignment(QtCore.Qt.AlignCenter)
@@ -214,7 +215,7 @@ def frame_3():
     widgets["result"].append(result)
     grid.addWidget(widgets["result"][-1], 4, 0, 1, 2)
 
-    image = QPixmap("logo_bottom_128px.png")
+    image = QPixmap("icons/logo_110x110.png")
     logo = QLabel()
     logo.setPixmap(image)
     logo.setAlignment(QtCore.Qt.AlignCenter)
@@ -260,6 +261,13 @@ def next_papaya_season():
 
     return next_season_start
 
+def end_of_papaya_season():
+
+    # supposing that value at index 0 in the json data has also the lowest value of all entries
+    end_of_season = main_season_list_as_months()[-1]
+
+    return end_of_season
+
 
 def get_availability_list_from_clicked_button():
 
@@ -294,7 +302,7 @@ def answer_sentence():
 
         place_affirming_animation_on_grid()
 
-        return "You're lucky! It's papaya season in " + clicked_answer_button_country
+        return "It's papaya season in " + clicked_answer_button_country + ". " + "The season ends in " + end_of_papaya_season()
 
     else:
 
@@ -306,7 +314,7 @@ def answer_sentence():
 def place_warning_animation_on_grid():
 
     label = QLabel()
-    animation = QMovie("error_solid_300px.gif")
+    animation = QMovie("icons/warning_500px.gif")
     label.setMovie(animation)
     animation.start()
     widgets["animation"].append(animation)
@@ -317,7 +325,7 @@ def place_warning_animation_on_grid():
 def place_affirming_animation_on_grid():
 
         label = QLabel()
-        animation = QMovie("confetti_solid_300px.gif")
+        animation = QMovie("icons/confirmation_500px.gif")
         label.setMovie(animation)
         animation.start()
         widgets["animation"].append(animation)
