@@ -3,10 +3,14 @@ import sys
 from PyQt5.QtWidgets import QApplication, QLabel, QPushButton, QWidget, QGridLayout
 from PyQt5.QtGui import QPixmap, QMovie
 from PyQt5 import QtCore
-from PyQt5.QtGui import QCursor, QFontDatabase
+from PyQt5.QtGui import QCursor, QFont, QFontDatabase
 import json
 from datetime import date
+import os
 
+# we need absolute path so the font file can be found in users directory
+# font file needs to be in same directory as main.py
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 widgets = {
 
@@ -15,22 +19,32 @@ widgets = {
     "question": [],
     "answers": [],
     "result": [],
-    "animation": []
-
+    "animation": [],
+    "header": [],
+    "description": [],
+    "back": [],
 }
 
 app = QApplication(sys.argv)
 
 window = QWidget()
 window.setWindowTitle("Papaya Season")
-# several buttons are created (downwards the GUI) based on how many countries
-# there are in the json data
-# therefore adjustSize() is used to react to the varying quantity of buttons
 window.adjustSize()
-window.setFixedWidth(700)
-window.setStyleSheet("background: 'white'")
+window.setMinimumSize(600, 840)
+window.setStyleSheet(
+    "background: '#F2CEE8'"
+)
 
 grid = QGridLayout()
+
+def load_font(font_file_name):
+    path_to_font_file = os.path.join(ROOT_DIR, font_file_name)
+    id = QFontDatabase.addApplicationFont(path_to_font_file)
+    if id < 0:
+        print(f"Font file {path_to_font_file} not found")
+    font_families = QFontDatabase.applicationFontFamilies(id)
+    font_name = font_families[0]
+    return QFont(font_name)
 
 
 clicked_answer_button_country = None
@@ -78,6 +92,12 @@ def show_frame1():
     frame_1()
 
 
+def show_frame2():
+
+    clear_widgets()
+    frame_2()
+
+
 def show_frame3():
 
     clear_widgets()
@@ -90,21 +110,20 @@ def start_game():
     frame_2()
 
 
-def create_buttons(answer, l_margin = 85, r_margin = 85):
+def create_buttons(answer, l_margin = 100, r_margin = 100):
 
     button = QPushButton(answer)
     button.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
-    # button.setFixedWidth(485)
-
+    button_font = load_font("DidactGothic-Regular.ttf")
+    button.setFont(button_font)
     button.setStyleSheet(
         "*{border: 2px solid '#353535';" +
         "margin-left: " + str(l_margin) + "px;" +
         "margin-right: " + str(r_margin) + "px;" + 
         "color: #353535;" +
         "font-size: 20px;" +
-        "border-radius: 25px;" +
-        "padding: 15px 0;" +
-        "margin-top: 20px}" +
+        "padding: 12px 0;" +
+        "margin-top: 10px}" +
         "*:hover{background-color: '#C6FF33'}"
     )
 
@@ -113,25 +132,55 @@ def create_buttons(answer, l_margin = 85, r_margin = 85):
 
 def frame_1():
 
-    # display logo
-    image = QPixmap("icons/logo_500px.png")
+    image = QPixmap("icons/logo_300px.png")
     logo = QLabel()
     logo.setPixmap(image)
     logo.setAlignment(QtCore.Qt.AlignCenter)
-    logo.setStyleSheet("margin-top: 50px;")
+    logo.setStyleSheet(
+        "margin-top: 20px;"
+    )
     widgets["logo"].append(logo)
 
-    # button widget
-    button = QPushButton("START")
-    button.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
 
+    header = QLabel("Enjoy better papayas - go by their harvest time")
+    font_header = load_font("DidactGothic-Regular.ttf")
+    header.setFont(font_header)
+    widgets["header"].append(header)
+    header.setAlignment(QtCore.Qt.AlignCenter)
+    header.setStyleSheet(
+        "font-size: 25px;" +
+        "color: '#353535';" +
+        "padding-top: 40px;" +
+        "padding-bottom: 10px;"
+        )
+
+
+    description = QLabel(
+        "Simply choose where your papaya is from and let" + "\n" +
+        "the app check the harvest time of the country" + "\n" +
+        "that you've chosen. Enjoy a fresher fruit."
+    )
+
+    widgets["description"].append(description)
+    description.setAlignment(QtCore.Qt.AlignCenter)
+    font_description = load_font("DidactGothic-Regular.ttf")
+    description.setFont(font_description)
+    description.setStyleSheet(
+        "font-size: 20px;" +
+        "color: '#353535';"
+    )
+
+
+    button = QPushButton("Start")
+    button.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
+    button_font = load_font("DidactGothic-Regular.ttf")
+    button.setFont(button_font)
     button.setStyleSheet(
         "*{border: 2px solid '#353535';" +
-        "border-radius: 45px;" +
-        "font-size: 35px;" +
+        "font-size: 30px;" +
         "color: '#353535';" +
-        "padding: 25px 0;" +
-        "margin: 100px 100px;}" +
+        "padding: 2px 0;" +
+        "margin: 85px 160px;}" +
         "*:hover{background: '#C6FF33';}"
     )
 
@@ -140,7 +189,9 @@ def frame_1():
     widgets["button"].append(button)
 
     grid.addWidget(widgets["logo"][-1], 0, 0, 1, 2)
-    grid.addWidget(widgets["button"][-1], 1, 0, 1, 2)
+    grid.addWidget(widgets["header"][-1], 4, 0, 1, 2)
+    grid.addWidget(widgets["description"][-1], 5, 0, 1, 2)
+    grid.addWidget(widgets["button"][-1], 6, 0, 1, 2)
 
 
 def frame_2():
@@ -148,12 +199,14 @@ def frame_2():
     question = QLabel("Where is your papaya from?")
     question.setAlignment(QtCore.Qt.AlignCenter)
     #question.setWordWrap(True)
+    question_font = load_font("DidactGothic-Regular.ttf")
+    question.setFont(question_font)
     question.setStyleSheet(
-        "font-family: 'Helvetica';" +
         "font-size: 25px;" +
         "color: '#353535';" +
-        "padding: 75px;"
-        "margin: 50px;")
+        "padding: 60px;"+
+        "margin-top: 20px;"
+    )
 
     widgets["question"].append(question)
 
@@ -164,14 +217,17 @@ def frame_2():
 
         grid.addWidget(widgets["answers"][i], j, 0, 1, 2)
 
-    image = QPixmap("icons/1.png")
+    image = QPixmap("icons/logo_110px.png")
     logo = QLabel()
     logo.setPixmap(image)
     logo.setAlignment(QtCore.Qt.AlignCenter)
-    logo.setStyleSheet("margin-top: 50x; margin-bottom: 15px;")
+    logo.setStyleSheet(
+        "margin-top: 50x;" +
+        "margin-bottom: 15px;"
+    )
     widgets["logo"].append(logo)
 
-    grid.addWidget(widgets["question"][-1], 1, 0, 1, 2)
+    grid.addWidget(widgets["question"][-1], 0, 0, 1, 2)
     # number of rows is dependent on number of countries for flexible position on grid
     grid.addWidget(widgets["logo"][-1], number_of_countries + 2, 0, 1, 2)
 
@@ -200,28 +256,51 @@ def fill_button_with_data():
         button.clicked.connect(show_frame3)
 
 
+def place_animation_on_grid():
+
+    if season_check() == True:
+
+        place_affirming_animation_on_grid()
+
+    else:
+
+        place_warning_animation_on_grid()
+
+
 def frame_3():
+
+    place_animation_on_grid()
 
     result = QLabel(answer_sentence())
     result.setAlignment(QtCore.Qt.AlignCenter)
     result.setWordWrap(True)
+    result_font = load_font("DidactGothic-Regular.ttf")
+    result.setFont(result_font)
     result.setStyleSheet(
-        "font-family: 'Helvetica';" +
         "font-size: 25px;" +
-        "color: '#353535';"
-        "padding: 75px;"
-        "margin: 50px;"
+        "color: '#353535';" +
+        "padding: 50px;"
     )
     widgets["result"].append(result)
-    grid.addWidget(widgets["result"][-1], 4, 0, 1, 2)
+    grid.addWidget(widgets["result"][-1], 4, 0, 2, 2)
 
-    image = QPixmap("icons/logo_110x110.png")
-    logo = QLabel()
-    logo.setPixmap(image)
-    logo.setAlignment(QtCore.Qt.AlignCenter)
-    logo.setStyleSheet("margin-top: 50x; margin-bottom: 15px;")
-    widgets["logo"].append(logo)
-    grid.addWidget(widgets["logo"][-1], number_of_countries + 2, 0, 1, 2)
+    button = QPushButton("Try another country")
+    button.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
+    button_font = load_font("DidactGothic-Regular.ttf")
+    button.setFont(button_font)
+    button.setStyleSheet(
+        "*{border: 2px solid '#353535';" +
+        "font-size: 30px;" +
+        "color: '#353535';" +
+        "padding: 2px 0;" +
+        "margin: 85px 120px;}" +
+        "*:hover{background: '#C6FF33';}"
+    )
+    button.clicked.connect(show_frame2)
+
+    widgets["back"].append(button)
+
+    grid.addWidget(widgets["back"][-1], 5, 0, 2, 2)
 
 
 main_season_for_clicked_button = None
@@ -230,11 +309,15 @@ main_season_for_clicked_button = None
 def get_main_season_list_from_clicked_button():
 
     with open("seasons.json", "r") as f:
+
         data = json.load(f)
 
     for country_dict in data["countries"]:
+
         if country_dict["country"] == clicked_answer_button_country:
+
             newlist = country_dict["mainSeason"]
+
             return newlist
 
 
@@ -260,6 +343,7 @@ def next_papaya_season():
     next_season_start = main_season_list_as_months()[0]
 
     return next_season_start
+
 
 def end_of_papaya_season():
 
@@ -300,15 +384,11 @@ def answer_sentence():
 
     if season_check() == True:
 
-        place_affirming_animation_on_grid()
-
-        return "It's papaya season in " + clicked_answer_button_country + ". " + "The season ends in " + end_of_papaya_season()
+        return "It's papaya season in " + clicked_answer_button_country + ". " + "The season ends in " + end_of_papaya_season() + "."
 
     else:
 
-        place_warning_animation_on_grid()
-
-        return "The next papaya season in " + clicked_answer_button_country + " starts in " + next_papaya_season()
+        return "The next papaya season in " + clicked_answer_button_country + " starts in " + next_papaya_season() + "."
 
 
 def place_warning_animation_on_grid():
@@ -317,9 +397,12 @@ def place_warning_animation_on_grid():
     animation = QMovie("icons/warning_500px.gif")
     label.setMovie(animation)
     animation.start()
-    widgets["animation"].append(animation)
+    widgets["animation"].append(label)
     label.setAlignment(QtCore.Qt.AlignCenter)
-    grid.addWidget(label, 1, 0, 3, 2)
+    label.setStyleSheet(
+        "margin-top: 20px;"
+    )
+    grid.addWidget(widgets["animation"][-1], 0, 0, 3, 2)
 
 
 def place_affirming_animation_on_grid():
@@ -328,9 +411,12 @@ def place_affirming_animation_on_grid():
         animation = QMovie("icons/confirmation_500px.gif")
         label.setMovie(animation)
         animation.start()
-        widgets["animation"].append(animation)
+        widgets["animation"].append(label)
         label.setAlignment(QtCore.Qt.AlignCenter)
-        grid.addWidget(label, 1, 0, 3, 2)
+        label.setStyleSheet(
+            "margin-top: 20px;"
+        )
+        grid.addWidget(widgets["animation"][-1], 0, 0, 3, 2)
 
 
 frame_1()
