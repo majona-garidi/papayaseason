@@ -1,9 +1,18 @@
-<p align="center">    <a href="https://github.com/probably-human/papayaseason" alt="Papaya Season Logo">
-    <img src="icons/logo_110px.png"/></a></p><h1 align="center"> Papaya Season </h1>
+<p align="center"><a href="https://github.com/probably-human/papayaseason">
+    <img src="icons/logo_110px.png" alt="Papaya Season Logo"/></a></p><h1 align="center"> Papaya Season </h1>
 
 <h4 align="center"> Qt-based GUI app that suggests the best time to eat papaya <br /> depending on where it was grown</h4>
 
 <h4 align="center"> Python 3.10, PyQt5</h4>
+
+## Table of Contents
+
+  - [Why Papaya Season?](#why-papaya-season)
+  - [Screen Recording](#screen-recording)
+  - [Dependencies](#dependencies)
+  - [Code overview](#code-overview)
+  - [Data](#data)
+  - [Credits](#credits)
 
 ## Why Papaya Season?
 
@@ -17,7 +26,17 @@ This gives you the prerequisite to **enjoy** my favourite fruit as well.
 
 <img src="icons/screenrecording_for_readme.gif" alt="Papaya Season Screen Recording"/>
 
-## Code overview
+## Dependencies
+
+Python 3, PyQt
+
+Tested with Python 3.10 and PyQt5 5.15.4
+
+## Installation and Usage
+
+Simply clone the repository and run the app with `python3 main.py`
+
+## Code Overview
 
 frame_1: Home - from here you can start the app
 
@@ -25,12 +44,13 @@ frame_2: The code allows a flexible number of buttons. It creates as many button
 
 frame_3: Based on the user’s choice, the app creates a unique answer and displays an animation to emphasize the given answer. Depending on which month it is, the app will check if it is papaya season in the chosen country, or not. The app will show a confirming animation and text if it is papaya season. Otherwise, it will show a warning animation and text. The user can click the “Try another country”-button to go back to frame_2 and choose another button.
 
+
 ## Data
 For this app I've researched harvest times in several countries and tried to make the data as realistic as possible. But the data should still be considered as testdata.
 
 ## Credits
-Thanks to: <a href="https://github.com/MariyaSha/TriviaGame">MariyaSha’s Trivia Game</a> app which served as a template for this app
+Thanks to: <a href="https://github.com/MariyaSha/TriviaGame" alt="Website of the Trivia Game">MariyaSha’s Trivia Game</a> app which served as a template for this app
 
-Animations: The animations are made with <a href="https://www.canva.com">Canva</a>'s free content license
+Logo & Animations: The logo and animations are made with <a href="https://www.canva.com" alt="Canva website">Canva</a>'s free content license
 
-Font: <a href = "https://github.com/ossobuffo/didact-gothic">Didact Gothic</a> by <a href="https://github.com/ossobuffo">ossobuffo</a>
+Font: <a href="https://github.com/ossobuffo/didact-gothic" alt="GitHub website of the font">Didact Gothic</a> by <a href="https://github.com/ossobuffo" alt = Website of the font maintainer>ossobuffo</a>
