@@ -2,38 +2,32 @@
   "countries": [
     {
       "country": "Jamaica",
-      "mainSeason": [6,7,8,9],
-      "availability": [1,2,3,4,5,6,7,8,9,10,11,12]
+      "mainSeason": [6,7,8,9]
     },
 
     {
       "country": "Mexico",
-      "mainSeason": [3,4,5,6,7],
-      "availability": [1,2,3,4,5,6,7,8,9,10,11,12]
+      "mainSeason": [3,4,5,6,7]
     },
 
     {
       "country": "India",
-      "mainSeason": [8,9,10,11],
-      "availability": [1,2,3,4,5,6,7,8,9,10,11,12]
+      "mainSeason": [8,9,10,11]
     },
 
     {
       "country": "Brazil",
-      "mainSeason": [8,9,10],
-      "availability": [1,2,3,4,5,6,7,8,9,10,11,12]
+      "mainSeason": [8,9,10]
     },
 
     {
       "country": "Nigeria",
-      "mainSeason": [4,5,6,7,8,9,10],
-      "availability": [6,7,8,9,10,11,12]
+      "mainSeason": [4,5,6,7,8,9,10]
     },
 
     {
       "country": "Germany",
-      "mainSeason": [8,9],
-      "availability": [6,7,8,9]
+      "mainSeason": [8,9]
     }
   ]
 }
