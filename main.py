@@ -2,7 +2,10 @@ import sys
 import json
 import calendar
 import os
-import typing
+
+from pathlib import Path
+
+from typing import Union
 
 from datetime import date
 
@@ -39,7 +42,7 @@ app = QApplication(sys.argv)
 grid = QGridLayout()
 
 
-def create_window(title, minimum_width, minimum_height):
+def create_window(title: str, minimum_width: int, minimum_height: int) -> QWidget:
 
     window = QWidget()
     window.setWindowTitle(title)
@@ -52,7 +55,7 @@ def create_window(title, minimum_width, minimum_height):
     return window
 
 
-def load_font(font_file_name):
+def load_font(font_file_name: Union[str, Path]) -> QFont:
 
     path_to_font_file = os.path.join(root_dir, font_file_name)
     id = QFontDatabase.addApplicationFont(path_to_font_file)
@@ -87,7 +90,7 @@ def clear_widgets():
             widgets[widget].pop()
 
 
-def get_countries_list_from_json(data_file_name):
+def get_countries_list_from_json(data_file_name) -> list[str]:
 
     with open(data_file_name, "r") as f:
 
@@ -102,6 +105,7 @@ def get_countries_list_from_json(data_file_name):
 
         return countries
 
+
 # TODO: global?refactor?
 # TODO: strong coupling data_file_name
 number_of_countries = len(get_countries_list_from_json("seasons.json"))
@@ -110,7 +114,7 @@ number_of_countries = len(get_countries_list_from_json("seasons.json"))
 main_season_for_clicked_button = None
 
 
-def get_main_season_list_from_clicked_button():
+def get_main_season_list_from_clicked_button() -> list[int]:
 
     with open("seasons.json", "r") as f:
 
@@ -125,7 +129,7 @@ def get_main_season_list_from_clicked_button():
             return main_season_list
 
 
-def main_season_list_as_months():
+def main_season_list_as_months() -> list[str]:
 
     month_list = []
 
@@ -141,7 +145,7 @@ def main_season_list_as_months():
 current_month = None
 
 
-def next_papaya_season():
+def next_papaya_season() -> str:
 
     # supposing that value at index 0 in the json data has also the lowest value of all entries
     next_season_start = main_season_list_as_months()[0]
@@ -149,7 +153,7 @@ def next_papaya_season():
     return next_season_start
 
 
-def end_of_papaya_season():
+def end_of_papaya_season() -> str:
 
     # supposing that value at index 0 in the json data has also the lowest value of all entries
     end_of_season = main_season_list_as_months()[-1]
@@ -157,22 +161,10 @@ def end_of_papaya_season():
     return end_of_season
 
 
-def get_availability_list_from_clicked_button():
-
-    with open("seasons.json", "r") as f:
-        data = json.load(f)
-
-    for country_dict in data["countries"]:
-
-        if country_dict["country"] == clicked_country:
-
-            return country_dict["availability"]
-
-
 current_month = date.today().month
 
 
-def is_season():
+def is_season() -> bool:
 
     season_list = get_main_season_list_from_clicked_button()
 
@@ -185,7 +177,7 @@ def is_season():
         return False
 
 
-def answer_sentence():
+def answer_sentence() -> str:
 
     if is_season():
 
@@ -195,7 +187,7 @@ def answer_sentence():
         return f"The next papaya season in {clicked_country} starts in {next_papaya_season()}."
 
 
-def which_button_was_clicked(clicked_button):
+def which_button_was_clicked(clicked_button: QPushButton) -> str:
 
     # sender() method of class QWidget saves whichever object sent a signal, here: clicked button
     global clicked_country
@@ -228,9 +220,9 @@ def start_game():
     frame_2()
 
 
-def create_buttons(answer):
+def create_buttons(text_on_button: str) -> QPushButton:
 
-    button = QPushButton(answer)
+    button = QPushButton(text_on_button)
     button.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
     button_font = load_font("DidactGothic-Regular.ttf")
     button.setFont(button_font)
@@ -248,7 +240,7 @@ def create_buttons(answer):
     return button
 
 
-def create_logo_widget(logo_file):
+def create_logo_widget(logo_file: Union[str, Path]) -> QLabel:
 
     image = QPixmap(logo_file)
     logo = QLabel()
@@ -262,7 +254,7 @@ def create_logo_widget(logo_file):
     return logo
 
 
-def create_header_widget(header_text, font_file_name):
+def create_header_widget(header_text: str, font_file_name: Union[str, Path]) -> QLabel:
     header = QLabel(header_text)
     font_header = load_font(font_file_name)
     header.setFont(font_header)
@@ -278,7 +270,7 @@ def create_header_widget(header_text, font_file_name):
     return header
 
 
-def create_description_widget(description_text, font_file_name):
+def create_description_widget(description_text: str, font_file_name: Union[str, Path]) -> QLabel():
 
     description = QLabel(description_text)
     widgets["description"].append(description)
@@ -293,7 +285,8 @@ def create_description_widget(description_text, font_file_name):
     return description
 
 
-def create_start_button(start_button_text, font_file_name):
+def create_start_button(start_button_text: str, font_file_name: Union[str, Path]) -> QPushButton:
+
     start_button = QPushButton(start_button_text)
     start_button.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
     button_font = load_font(font_file_name)
@@ -313,7 +306,7 @@ def create_start_button(start_button_text, font_file_name):
     return start_button
 
 
-def create_question_widget(question_text, font_file_name):
+def create_question_widget(question_text: str, font_file_name: Union[str, Path]) -> QLabel:
 
     question = QLabel(question_text)
     question.setAlignment(QtCore.Qt.AlignCenter)
@@ -326,14 +319,16 @@ def create_question_widget(question_text, font_file_name):
         "padding: 60px;"+
         "margin-top: 20px;"
     )
+
     return question
 
 
-def fill_button_with_data(data_file_name):
+def fill_button_with_data(data_file_name: Union[str, Path]):
 
     for i in range(0, number_of_countries):
 
-        button = create_buttons(get_countries_list_from_json(data_file_name)[i])
+        country = get_countries_list_from_json(data_file_name)[i]
+        button = create_buttons(text_on_button=country)
         widgets["answers"].append(button)
 
         # Every new button object stores the function below
@@ -345,7 +340,7 @@ def fill_button_with_data(data_file_name):
         button.clicked.connect(show_frame3)
 
 
-def create_small_logo_widget():
+def create_small_logo_widget() -> QLabel:
 
     image = QPixmap("icons/logo_110px.png")
     logo_small = QLabel()
@@ -360,7 +355,7 @@ def create_small_logo_widget():
     return logo_small
 
 
-def place_animation_on_grid(affirming_animation_file_name, warning_animation_file_name):
+def place_animation_on_grid(affirming_animation_file_name: Union[str, Path], warning_animation_file_name: Union[str, Path]):
 
     if is_season():
 
@@ -371,7 +366,7 @@ def place_animation_on_grid(affirming_animation_file_name, warning_animation_fil
         place_warning_animation_on_grid(warning_animation_file_name)
 
 
-def place_warning_animation_on_grid(animation_file_name):
+def place_warning_animation_on_grid(animation_file_name: Union[str, Path]):
 
     label = QLabel()
     animation = QMovie(animation_file_name)
@@ -386,7 +381,7 @@ def place_warning_animation_on_grid(animation_file_name):
     grid.addWidget(widgets["animation"][-1], 0, 0, 3, 2)
 
 
-def place_affirming_animation_on_grid(animation_file_name):
+def place_affirming_animation_on_grid(animation_file_name: Union[str, Path]):
 
         label = QLabel()
         animation = QMovie(animation_file_name)
@@ -401,7 +396,7 @@ def place_affirming_animation_on_grid(animation_file_name):
         grid.addWidget(widgets["animation"][-1], 0, 0, 3, 2)
 
 
-def create_result_widget(font_file_name):
+def create_result_widget(font_file_name: Union[str, Path]) -> QLabel:
 
     result = QLabel(answer_sentence())
     result.setAlignment(QtCore.Qt.AlignCenter)
@@ -418,7 +413,7 @@ def create_result_widget(font_file_name):
     return result
 
 
-def create_back_button(back_button_text, font_file_name):
+def create_back_button(back_button_text: str, font_file_name: Union[str, Path]) -> QPushButton:
 
     button = QPushButton(back_button_text)
     button.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
