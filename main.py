@@ -316,7 +316,7 @@ def create_question_widget(question_text: str, font_file_name: Union[str, Path])
     question.setStyleSheet(
         "font-size: 25px;" +
         "color: '#353535';" +
-        "padding: 60px;"+
+        "padding: 60px;" +
         "margin-top: 20px;"
     )
 
