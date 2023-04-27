@@ -3,6 +3,10 @@ import json
 import calendar
 import os
 
+import view
+import model
+import controller
+
 from pathlib import Path
 
 from typing import Union
@@ -16,78 +20,7 @@ from PyQt5.QtGui import QPixmap, QMovie, QCursor, QFont, QFontDatabase
 from PyQt5.QtWidgets import QApplication, QLabel, QPushButton, QWidget, QGridLayout
 
 
-# We need absolute path so the font file can be found in users directory
-# font file needs to be in same directory as main.py
-root_dir = os.path.dirname(os.path.abspath(__file__))
-
-widgets = {
-
-    "logo": [],
-    "logo_small": [],
-    "start_button": [],
-    "button": [],
-    "question": [],
-    "answers": [],
-    "result": [],
-    "animation": [],
-    "header": [],
-    "description": [],
-    "back": [],
-}
-
-
-app = QApplication(sys.argv)
-
-
-grid = QGridLayout()
-
-
-def create_window(title: str, minimum_width: int, minimum_height: int) -> QWidget:
-
-    window = QWidget()
-    window.setWindowTitle(title)
-    window.adjustSize()
-    window.setMinimumSize(minimum_width, minimum_height)
-    window.setStyleSheet(
-        "background: '#F2CEE8'"
-        )
-
-    return window
-
-
-def load_font(font_file_name: Union[str, Path]) -> QFont:
-
-    path_to_font_file = os.path.join(root_dir, font_file_name)
-    id = QFontDatabase.addApplicationFont(path_to_font_file)
-
-    if id < 0:
-
-        print(f"Font file {path_to_font_file} not found")
-
-    font_families = QFontDatabase.applicationFontFamilies(id)
-    font_name = font_families[0]
-
-    return QFont(font_name)
-
-
 clicked_country = None
-
-
-def clear_widgets():
-
-    for widget in widgets:
-
-        if widgets[widget] != []:
-
-            widgets[widget][-1].hide()
-
-            for w in widgets[widget]:
-
-                w.hide()
-
-        for i in range(0, len(widgets[widget])):
-
-            widgets[widget].pop()
 
 
 def get_countries_list_from_json(data_file_name) -> list[str]:
@@ -196,102 +129,11 @@ def which_button_was_clicked(clicked_button: QPushButton) -> str:
     return clicked_country
 
 
-def show_frame1():
-
-    clear_widgets()
-    frame_1()
-
-
-def show_frame2():
-
-    clear_widgets()
-    frame_2()
-
-
-def show_frame3():
-
-    clear_widgets()
-    frame_3()
-
-
-def start_game():
-
-    clear_widgets()
-    frame_2()
-
-
-def create_buttons(text_on_button: str) -> QPushButton:
-
-    button = QPushButton(text_on_button)
-    button.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
-    button_font = load_font("DidactGothic-Regular.ttf")
-    button.setFont(button_font)
-    button.setStyleSheet(
-        "*{border: 2px solid '#353535';" +
-        "margin-left: 100px;" +
-        "margin-right: 100px;" +
-        "color: #353535;" +
-        "font-size: 20px;" +
-        "padding: 12px 0;" +
-        "margin-top: 10px}" +
-        "*:hover{background-color: '#C6FF33'}"
-    )
-
-    return button
-
-
-def create_logo_widget(logo_file: Union[str, Path]) -> QLabel:
-
-    image = QPixmap(logo_file)
-    logo = QLabel()
-    logo.setPixmap(image)
-    widgets["logo"].append(logo)
-    logo.setAlignment(QtCore.Qt.AlignCenter)
-    logo.setStyleSheet(
-        "margin-top: 20px;"
-    )
-
-    return logo
-
-
-def create_header_widget(header_text: str, font_file_name: Union[str, Path]) -> QLabel:
-    header = QLabel(header_text)
-    font_header = load_font(font_file_name)
-    header.setFont(font_header)
-    widgets["header"].append(header)
-    header.setAlignment(QtCore.Qt.AlignCenter)
-    header.setStyleSheet(
-        "font-size: 25px;" +
-        "color: '#353535';" +
-        "padding-top: 40px;" +
-        "padding-bottom: 10px;"
-        )
-
-    return header
-
-
-def create_description_widget(description_text: str, font_file_name: Union[str, Path]) -> QLabel():
-
-    description = QLabel(description_text)
-    widgets["description"].append(description)
-    description.setAlignment(QtCore.Qt.AlignCenter)
-    font_description = load_font(font_file_name)
-    description.setFont(font_description)
-    description.setStyleSheet(
-        "font-size: 20px;" +
-        "color: '#353535';"
-    )
-
-    return description
-
-
-def create_start_button(start_button_text: str, font_file_name: Union[str, Path]) -> QPushButton:
+def create_start_button(start_button_text: str) -> QPushButton:
 
     start_button = QPushButton(start_button_text)
     start_button.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
-    button_font = load_font(font_file_name)
-    start_button.setFont(button_font)
-    widgets["start_button"].append(start_button)
+    view.widgets["start_button"].append(start_button)
     start_button.setStyleSheet(
         "*{border: 2px solid '#353535';" +
         "font-size: 30px;" +
@@ -305,188 +147,84 @@ def create_start_button(start_button_text: str, font_file_name: Union[str, Path]
 
     return start_button
 
+def show_frame1():
 
-def create_question_widget(question_text: str, font_file_name: Union[str, Path]) -> QLabel:
-
-    question = QLabel(question_text)
-    question.setAlignment(QtCore.Qt.AlignCenter)
-    question_font = load_font(font_file_name)
-    question.setFont(question_font)
-    widgets["question"].append(question)
-    question.setStyleSheet(
-        "font-size: 25px;" +
-        "color: '#353535';" +
-        "padding: 60px;" +
-        "margin-top: 20px;"
-    )
-
-    return question
+    view.clear_widgets()
+    view.frame_1()
 
 
-def fill_button_with_data(data_file_name: Union[str, Path]):
+def show_frame2():
 
-    for i in range(0, number_of_countries):
-
-        country = get_countries_list_from_json(data_file_name)[i]
-        button = create_buttons(text_on_button=country)
-        widgets["answers"].append(button)
-
-        # Every new button object stores the function below
-        # if the button gets clicked, the lambda function gets executed
-        # connect usually only requires the name of a  normal function, not a lambda function
-        # but without the lambda it wasn't possible to pass the button argument
-        button.clicked.connect(lambda: which_button_was_clicked(button))
-
-        button.clicked.connect(show_frame3)
+    view.clear_widgets()
+    view.frame_2()
 
 
-def create_small_logo_widget() -> QLabel:
+def show_frame3():
 
-    image = QPixmap("icons/logo_110px.png")
-    logo_small = QLabel()
-    logo_small.setPixmap(image)
-    logo_small.setAlignment(QtCore.Qt.AlignCenter)
-    logo_small.setStyleSheet(
-        "margin-top: 50x;" +
-        "margin-bottom: 15px;"
-    )
-    widgets["logo_small"].append(logo_small)
-
-    return logo_small
+    view.clear_widgets()
+    view.frame_3()
 
 
-def place_animation_on_grid(affirming_animation_file_name: Union[str, Path], warning_animation_file_name: Union[str, Path]):
+def start_game():
 
-    if is_season():
-
-        place_affirming_animation_on_grid(affirming_animation_file_name)
-
-    else:
-
-        place_warning_animation_on_grid(warning_animation_file_name)
-
-
-def place_warning_animation_on_grid(animation_file_name: Union[str, Path]):
-
-    label = QLabel()
-    animation = QMovie(animation_file_name)
-    label.setMovie(animation)
-    animation.start()
-    widgets["animation"].append(label)
-    label.setAlignment(QtCore.Qt.AlignCenter)
-    label.setStyleSheet(
-        "margin-top: 20px;"
-    )
-
-    grid.addWidget(widgets["animation"][-1], 0, 0, 3, 2)
-
-
-def place_affirming_animation_on_grid(animation_file_name: Union[str, Path]):
-
-        label = QLabel()
-        animation = QMovie(animation_file_name)
-        label.setMovie(animation)
-        animation.start()
-        widgets["animation"].append(label)
-        label.setAlignment(QtCore.Qt.AlignCenter)
-        label.setStyleSheet(
-            "margin-top: 20px;"
-        )
-
-        grid.addWidget(widgets["animation"][-1], 0, 0, 3, 2)
-
-
-def create_result_widget(font_file_name: Union[str, Path]) -> QLabel:
-
-    result = QLabel(answer_sentence())
-    result.setAlignment(QtCore.Qt.AlignCenter)
-    result.setWordWrap(True)
-    result_font = load_font(font_file_name)
-    result.setFont(result_font)
-    result.setStyleSheet(
-        "font-size: 25px;" +
-        "color: '#353535';" +
-        "padding: 50px;"
-    )
-    widgets["result"].append(result)
-
-    return result
-
-
-def create_back_button(back_button_text: str, font_file_name: Union[str, Path]) -> QPushButton:
-
-    button = QPushButton(back_button_text)
-    button.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
-    button_font = load_font(font_file_name)
-    button.setFont(button_font)
-    button.setStyleSheet(
-        "*{border: 2px solid '#353535';" +
-        "font-size: 30px;" +
-        "color: '#353535';" +
-        "padding: 2px 0;" +
-        "margin: 85px 120px;}" +
-        "*:hover{background: '#C6FF33';}"
-    )
-    button.clicked.connect(show_frame2)
-
-    widgets["back"].append(button)
-
-    return button
+    view.clear_widgets()
+    view.frame_2()
 
 
 def frame_1():
 
-    create_logo_widget("icons/logo_300px.png")
-    grid.addWidget(widgets["logo"][-1], 0, 0, 1, 2)
+    view.create_logo_widget("icons/logo_300px.png")
+    view.grid.addWidget(view.widgets["logo"][-1], 0, 0, 1, 2)
 
-    create_header_widget("Enjoy better papayas - go by their harvest time", "DidactGothic-Regular.ttf")
-    grid.addWidget(widgets["header"][-1], 4, 0, 1, 2)
+    view.create_header_widget("Enjoy better papayas - go by their harvest time")
+    view.grid.addWidget(view.widgets["header"][-1], 4, 0, 1, 2)
 
     description = (
         "Simply choose where your papaya is from and let" + "\n" +
         "the app check the harvest time of the country" + "\n" +
         "that you've chosen. Enjoy a fresher fruit."
     )
-    create_description_widget(description, "DidactGothic-Regular.ttf")
-    grid.addWidget(widgets["description"][-1], 5, 0, 1, 2)
+    view.create_description_widget(description)
+    view.grid.addWidget(view.widgets["description"][-1], 5, 0, 1, 2)
 
-    create_start_button("Start", "DidactGothic-Regular.ttf")
-    grid.addWidget(widgets["start_button"][-1], 6, 0, 1, 2)
-
-
-def frame_2():
-
-    create_question_widget("Where is your papaya from?", "DidactGothic-Regular.ttf")
-    grid.addWidget(widgets["question"][-1], 0, 0, 1, 2)
-
-    fill_button_with_data("seasons.json")
-    # buttons for countries start from second row in grid
-    for i, j in zip(range(0, number_of_countries), range(2, number_of_countries + 2)):
-
-        grid.addWidget(widgets["answers"][i], j, 0, 1, 2)
-
-    create_small_logo_widget()
-    # number of rows is dependent on number of countries for flexible position on grid
-    grid.addWidget(widgets["logo_small"][-1], number_of_countries + 2, 0, 1, 2)
+    create_start_button("Start")
+    view.grid.addWidget(view.widgets["start_button"][-1], 6, 0, 1, 2)
 
 
-def frame_3():
+    def frame_2():
+        # TODO frame_2() got imported to view because of the function fill_button_with_data() and others, but needs to use number_of_countries - delete gloabl variable number_of_countries?
+        global number_of_countries
 
-    place_animation_on_grid(affirming_animation_file_name="icons/confirmation_500px.gif", warning_animation_file_name="icons/warning_500px.gif")
+        view.create_question_widget("Where is your papaya from?")
+        view.grid.addWidget(view.widgets["question"][-1], 0, 0, 1, 2)
 
-    create_result_widget("DidactGothic-Regular.ttf")
-    grid.addWidget(widgets["result"][-1], 4, 0, 2, 2)
+        view.fill_button_with_data("seasons.json")
+        # buttons for countries start from second row in grid
+        for i, j in zip(range(0, number_of_countries), range(2, number_of_countries + 2)):
+            view.grid.addWidget(view.widgets["answers"][i], j, 0, 1, 2)
 
-    create_back_button("Try another country", "DidactGothic-Regular.ttf")
-    grid.addWidget(widgets["back"][-1], 5, 0, 2, 2)
+        view.create_small_logo_widget()
+        # number of rows is dependent on number of countries for flexible position on grid
+        view.grid.addWidget(view.widgets["logo_small"][-1], number_of_countries + 2, 0, 1, 2)
 
 
-window = create_window(title="Papaya Season", minimum_width=600, minimum_height=840)
-window.setLayout(grid)
+    def frame_3():
+        view.place_animation_on_grid(affirming_animation_file_name="icons/confirmation_500px.gif",
+                                warning_animation_file_name="icons/warning_500px.gif")
+
+        view.create_result_widget()
+        view.grid.addWidget(view.widgets["result"][-1], 4, 0, 2, 2)
+
+        view.create_back_button("Try another country")
+        view.grid.addWidget(view.widgets["back"][-1], 5, 0, 2, 2)
+
+
+window = view.create_window(title="Papaya Season", minimum_width=600, minimum_height=840)
+window.setLayout(view.grid)
 window.show()
 
 
 frame_1()
 
 
-sys.exit(app.exec())
+sys.exit(view.app.exec())
